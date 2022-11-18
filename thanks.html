@@ -1,15 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <div>Thanks ページです。</div>
-    <!-- ここに成果地点タグを挿入します -->
 
-    <!-- ------------------------- -->
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <div>Thanks ページです。</div>
+  <!-- ここに成果地点タグを挿入します -->
+  <script>
+    const rmtConversion = () => {
+      const RMT_AD_ID = 'yw1iKB'
+      const RMT_AD_ID_KEY = '_rmt_ad_id_'
+      const RMT_SID_KEY = '_rmt_sid_'
+
+      const findAdId = (kvPairs) => {
+        const targetKey = Object.keys(kvPairs).find((key) => key.includes(RMT_AD_ID_KEY)) || ''
+        const targetAdId = targetKey.split(RMT_AD_ID_KEY)[1] || ''
+        return targetAdId;
+      }
+
+      const kvPairsFromCookie = () => {
+        // Cookie Data
+        const kvs = document.cookie.split("; ").map((_kvs) => _kvs.split('='))
+        if (Object.keys(kvs).length < 2) return null
+        const kvPairs = Object.fromEntries(kvs)
+        return kvPairs
+      }
+
+      const kvPairsFromLocalStorage = () => {
+        // localStorage Data
+        const lsKeys = Object.keys(localStorage)
+        const kvs = lsKeys.map((key) => [key, localStorage.getItem(key)])
+        if (Object.keys(kvs).length < 2) return null
+        const kvPairs = Object.fromEntries(kvs)
+        return kvPairs
+      }
+
+      const clearCookieAndLocalStorageData = () => {
+        // remove RMT_AD_ID_KEY Cookie
+        document.cookie = `${RMT_AD_ID_KEY}${targetAdId}=; max-age=0;`
+        // remove RMT_SID_KEY Cookie
+        document.cookie = `${RMT_SID_KEY}${targetAdId}=; max-age=0;`
+
+        // remove RMT_AD_ID_KEY localStorage data
+        localStorage.removeItem(`${RMT_AD_ID_KEY}${targetAdId}`)
+        // remove RMT_SID_KEY Cookie
+        localStorage.removeItem(`${RMT_SID_KEY}${targetAdId}`)
+      }
+
+      // Main Logic
+      const kvPairs = kvPairsFromCookie() || kvPairsFromLocalStorage() || {}
+      const adId = findAdId(kvPairs)
+
+      const rmtAdId = kvPairs[`${RMT_AD_ID_KEY}${adId}`]
+      const rmtSid = kvPairs[`${RMT_SID_KEY}${adId}`]
+
+      const params = {
+        rmt_ad_id: rmtAdId,
+        rmt_sid: rmtSid
+      }
+
+      const url = 'https://stg-entry-api.recommect.com'
+      const xhr = new XMLHttpRequest()
+      xhr.open('POST', url)
+      xhr.send(params)
+
+      // if succeeded, remove cookies
+      xhr.onloadend = () => {
+        if (xhr.status === 200) {
+          clearCookieAndLocalStorageData()
+        }
+      }
+    }
+    rmtConversion()
+  </script>
+  <!-- ------------------------- -->
+</body>
+
 </html>
