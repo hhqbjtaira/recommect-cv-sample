@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <h2>Recommect の 広告の cookie 発行ページです。</h1>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <h2>Recommect の 広告の cookie 発行ページです。</h1>
 
     <h3>
       本ページを複数ドメインで検証する場合は、以下のリンクを広告で設定したURLと同一のものにして遷移してください。
@@ -20,9 +22,73 @@
     <a href="/thanks.html">サンクスページへ</a>
 
     <!-- ここに着地点タグを挿入します -->
+    <script>
+      const rmtKeep = () => {
+        const RMT_AD_ID_KEY = 'rmt_ad_id'
+        const RMT_SID_KEY = 'rmt_sid'
+
+        const saveCookiesAndLocalStorage = (data) => {
+          const rmtAdIdValue = data[RMT_AD_ID_KEY]
+          const rmtSidValue = data[RMT_SID_KEY]
+
+          if (!rmtAdIdValue || !rmtSidValue) return
+
+          setRecommectLocalStorage(rmtAdIdValue, rmtSidValue)
+          setRecommectCookie(rmtAdIdValue, rmtSidValue)
+        }
+
+        const fetchUrlParameters = () => {
+          const urlSearchParamsPairs = location.search
+            .substring(1)
+            .split('&')
+            .map((params) => params.split('='))
+          const kvPairs = Object.fromEntries(urlSearchParamsPairs)
+          return kvPairs
+        }
+
+        const setRecommectLocalStorage = (rmtAdIdValue, rmtSidValue) => {
+          // Set AD_ID localStorage
+          const adIdCookieKey = `_${RMT_AD_ID_KEY}_${rmtAdIdValue}`
+          localStorage.setItem(adIdCookieKey, rmtAdIdValue)
+
+          // Set SID localStorage
+          const sidCookieKey = `_${RMT_SID_KEY}_${rmtAdIdValue}`
+          localStorage.setItem(sidCookieKey, rmtSidValue)
+        }
+
+        const setRecommectCookie = (rmtAdIdValue, rmtSidValue) => {
+          const xhr = new XMLHttpRequest()
+          const issueCookiesUrl = `./issue_cookies.php?${RMT_AD_ID_KEY}=${rmtAdIdValue}&${RMT_SID_KEY}=${rmtSidValue}`
+          xhr.open('GET', issueCookiesUrl)
+          xhr.onloadend = () => {
+            if (xhr.status === 200) return
+
+            // Cookie Options
+            const date = new Date()
+            date.setDate(date.getDate() + 90) // 90 days after
+            const cookieOptions = `; expires=${date.toUTCString()}; path=/; SameSite=lax; Secure;`
+
+            // Set AD_ID Cookie
+            const adIdCookieKey = `_${RMT_AD_ID_KEY}_${rmtAdIdValue}`
+            document.cookie = `${adIdCookieKey}=${rmtAdIdValue}${cookieOptions}`
+
+            // Set SID Cookie
+            const sidCookieKey = `_${RMT_SID_KEY}_${rmtAdIdValue}`
+            document.cookie = `${sidCookieKey}=${rmtSidValue}${cookieOptions}`
+          }
+          xhr.send()
+        }
+
+        // Main Logic
+        const urlParameters = fetchUrlParameters()
+        saveCookiesAndLocalStorage(urlParameters)
+      }
+      rmtKeep()
+    </script>
 
     <!-- ------------------------- -->
 
     <!-- ※ 同階層に issue_cookie.php を配置してください -->
-  </body>
+</body>
+
 </html>
