@@ -59,14 +59,15 @@
       const rmtAdId = kvPairs[`${RMT_AD_ID_KEY}${adId}`]
       const rmtSid = kvPairs[`${RMT_SID_KEY}${adId}`]
 
-      const params = {
+      const params = new URLSearchParams({
         rmt_ad_id: rmtAdId,
         rmt_sid: rmtSid
-      }
+      })
 
       const url = 'https://stg-entry-api.recommect.com/v1/entry/advertisements/R1xiDB/conversion'
       const xhr = new XMLHttpRequest()
       xhr.open('POST', url)
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
       xhr.send(params)
 
       // if succeeded, remove cookies
