@@ -25,7 +25,7 @@
 
       const kvPairsFromCookie = () => {
         // Cookie Data
-        const kvs = document.cookie.split("; ").map((_kvs) => _kvs.split('='))
+        const kvs = document.cookie.split('; ').map((_kvs) => _kvs.split('='))
         if (Object.keys(kvs).length < 2) return null
         const kvPairs = Object.fromEntries(kvs)
         return kvPairs
@@ -64,7 +64,7 @@
         rmt_sid: rmtSid
       })
 
-      const url = 'https://stg-entry-api.recommect.com/v1/entry/advertisements/R1xiDB/conversion'
+      const url = 'https://stg-entry-api.recommect.com/v1/entry/advertisements/yaYiYy/conversion'
       const xhr = new XMLHttpRequest()
       xhr.open('POST', url)
       xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
