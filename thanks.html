@@ -13,7 +13,7 @@
   <!-- ここに成果地点タグを挿入します -->
   <script>
     const rmtConversion = () => {
-      const RMT_AD_ID = 'R1xiDB'
+      const RMT_AD_ID = 'yaYiYy'
       const RMT_AD_ID_KEY = '_rmt_ad_id_'
       const RMT_SID_KEY = '_rmt_sid_'
 
@@ -40,7 +40,7 @@
         return kvPairs
       }
 
-      const clearCookieAndLocalStorageData = () => {
+      const clearCookieAndLocalStorageData = (targetAdId) => {
         // remove RMT_AD_ID_KEY Cookie
         document.cookie = `${RMT_AD_ID_KEY}${targetAdId}=; max-age=0;`
         // remove RMT_SID_KEY Cookie
@@ -73,7 +73,7 @@
       // if succeeded, remove cookies
       xhr.onloadend = () => {
         if (xhr.status === 200) {
-          clearCookieAndLocalStorageData()
+          clearCookieAndLocalStorageData(adId)
         }
       }
     }
